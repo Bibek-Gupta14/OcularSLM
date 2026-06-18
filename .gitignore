@@ -1,0 +1,29 @@
+# Environment variables (Sensitive API Keys)
+.env
+.env.local
+
+# Python Cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local Screen Captures and Temporary Images
+screenshot.png
+temp_pasted_image.png
+test_image.png
+temp.txt
+
+# OS-specific temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE-specific configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp

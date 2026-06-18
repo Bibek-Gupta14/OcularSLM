@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Agent Dashboard</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- SVG Scroll Animated Line -->
+    <div class="svg-line-container">
+        <svg class="scroll-svg" viewBox="0 0 100 1200" preserveAspectRatio="none">
+            <path id="scroll-path" d="M 50 0 C 15 250, 85 500, 50 750 C 15 1000, 85 1100, 50 1200" stroke="url(#scroll-grad)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <defs>
+                <linearGradient id="scroll-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#0A84FF"/>
+                    <stop offset="50%" stop-color="#30D158"/>
+                    <stop offset="100%" stop-color="#0A84FF"/>
+                </linearGradient>
+            </defs>
+        </svg>
+    </div>
+
+    <!-- Main Container -->
+    <div class="app-layout">
+        
+        <!-- HEADER -->
+        <header class="app-header animate-fade-in">
+            <div class="header-logo">
+                <div class="logo-glow"></div>
+                <span class="logo-icon">🧿</span>
+                <h1>Hybrid SLM + Vision Agent</h1>
+            </div>
+            <p class="subtitle">Autonomous Local Execution powered by OpenRouter Cloud Reasoning</p>
+        </header>
+
+        <main class="grid-container">
+
+            <!-- SECTION 1: CONFIGURATION & STATUS -->
+            <section class="card config-card animate-slide-up" style="--delay: 1;">
+                <div class="card-header">
+                    <h2>⚙️ System Configuration</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="api-key">OpenRouter API Key</label>
+                        <input type="password" id="api-key" placeholder="sk-or-v1-...">
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="text-model">Text Model (SLM)</label>
+                            <select id="text-model">
+                                <option value="nvidia/nemotron-3-super-120b-a12b:free">Nvidia Nemotron 3 Super (Free)</option>
+                                <option value="meta-llama/llama-3.3-70b-instruct:free">Llama 3.3 70B (Free)</option>
+                                <option value="meta-llama/llama-3.2-3b-instruct:free">Llama 3.2 3B (Free)</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label for="vision-model">Vision Model (VLM)</label>
+                            <select id="vision-model">
+                                <option value="nvidia/nemotron-nano-12b-v2-vl:free">Nvidia Nemotron Nano VL (Free)</option>
+                                <option value="nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free">Nvidia Nemotron Omni (Free)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button id="save-config-btn" class="btn btn-secondary">Apply Settings</button>
+                </div>
+            </section>
+
+            <!-- SECTION 2: THE CHAT CONTAINER -->
+            <section class="card chat-card animate-slide-up" style="--delay: 2;">
+                <div class="card-header">
+                    <h2>💬 Conversational Interface</h2>
+                </div>
+                <div class="chat-messages" id="chat-box">
+                    <div class="message system-msg">
+                        Agent initialized. Try asking: <em>"Take a screenshot and inspect it"</em> or <em>"Create a todo.txt listing my tasks."</em>
+                    </div>
+                </div>
+                <!-- Image attachment preview container -->
+                <div class="image-preview-wrapper" id="preview-wrapper" style="display: none;">
+                    <div class="preview-thumbnail">
+                        <img id="preview-img" src="" alt="Pasted snippet">
+                        <button id="clear-preview-btn" class="clear-btn">&times;</button>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <input type="text" id="chat-input" placeholder="Type instruction or Paste image (Ctrl+V)..." autocomplete="off">
+                    <button id="send-btn" class="btn btn-primary">Send</button>
+                </div>
+            </section>
+
+            <!-- SECTION 3: REAL-TIME CONSOLE & SCREENSHOT -->
+            <section class="card dashboard-card animate-slide-up" style="--delay: 3;">
+                <div class="dashboard-columns">
+                    <!-- Tool Activity Log -->
+                    <div class="console-column">
+                        <div class="column-header">
+                            <h3>🖥️ Agent Activity & Tools Log</h3>
+                        </div>
+                        <div class="console-output" id="console-box">
+                            <div class="console-line system">[System] Waiting for tool calls...</div>
+                        </div>
+                    </div>
+
+                    <!-- Visual Panel (Lazy loaded screenshot) -->
+                    <div class="screen-column">
+                        <div class="column-header">
+                            <h3>📸 Latest Screen Capture</h3>
+                        </div>
+                        <div class="screenshot-container lazy-load-wrapper" id="screenshot-wrapper">
+                            <!-- Image is lazy-loaded -->
+                            <img data-src="/screenshot.png" alt="Desktop screenshot" id="screenshot-img" class="lazy-image">
+                            <div class="image-overlay" id="image-overlay">
+                                <span>No screen captures yet. Trigger 'take_screenshot' to view.</span>
+                            </div>
+                        </div>
+                        <div class="quick-actions">
+                            <button id="snap-btn" class="btn btn-action">⚡ Capture & Analyze</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="app-footer">
+            <p class="btn">Hybrid SLM + Vision Agent</p>
+            <p>Built with ❤️ for OpenSource Community and Edge Device Autonomy.</p>
+        </footer>
+
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
