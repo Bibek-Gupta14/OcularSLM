@@ -157,7 +157,7 @@ KIRO  <br><br>
 
 ### 1. Clone & Navigate to Project Workspace
 ```powershell
-cd "c:\Users\KIIT0001\OneDrive\Desktop\GENAI\AI Notetaker"
+git clone "https://github.com/Bibek-Gupta14/OcularSLM"
 ```
 
 ### 2. Configure Environment Variables
