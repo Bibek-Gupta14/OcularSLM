@@ -9,8 +9,9 @@
 
 ## 🎨 System Walkthrough & Screenshots
 
-**1. Initial Dashboard Layout**  
-<img src="assets/dashboard.png" width="550px" height="475px" alt="Initial Dashboard"> 
+<p align="center">
+  <img src="assets/dashboard.png" width="600px" height="600px" alt="Initial Dashboard"> 
+</p>
 
 ---
 
