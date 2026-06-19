@@ -1,6 +1,7 @@
 import os
 import json
 import asyncio
+from typing import Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -21,9 +22,10 @@ settings = Settings()
 
 class ChatRequest(BaseModel):
     message: str
-    image: str = None  # Base64 data URI string
+    image: Optional[str] = None  # Base64 data URI string
     text_model: str = DEFAULT_MODEL
     vision_model: str = DEFAULT_VISION_MODEL
+
 
 class ConfigUpdate(BaseModel):
     text_model: str
@@ -196,7 +198,9 @@ async def agent_execution_generator(user_message: str, image: str = None):
             
             # Stream final message out
             yield json.dumps({"type": "message", "content": final_content}) + "\n"
+            yield json.dumps({"type": "status", "content": "Execution Complete. Agent is ready."}) + "\n"
             processing = False
+
 
 @app.post("/api/chat")
 async def chat_endpoint(request: ChatRequest):
@@ -243,6 +247,15 @@ if not os.path.exists(static_dir):
 
 app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
+@app.on_event("startup")
+async def startup_event():
+    from tools import index_codebase
+    print("[Startup] Indexing local codebase into vector store...")
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(None, index_codebase)
+    print(f"[Startup] Indexing complete: {result}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host="127.0.0.1", port=8000, reload=True)
+

@@ -1,7 +1,39 @@
 import os
 import json
 from PIL import ImageGrab
+from pydantic import BaseModel, Field, ValidationError
+from vector_store import WorkspaceVectorStore
 
+# Initialize the workspace vector store
+vector_store = WorkspaceVectorStore()
+
+# --------------------------------------------------
+# Pydantic Schemas for Structured Output Validation
+# --------------------------------------------------
+class WriteFileArgs(BaseModel):
+    filename: str = Field(..., description="The name of the file to create or overwrite (e.g. notes.txt).")
+    content: str = Field(..., description="The full text content to write inside the file.")
+
+class ReadFileArgs(BaseModel):
+    filename: str = Field(..., description="The name of the file to read (e.g. notes.txt).")
+
+class TakeScreenshotArgs(BaseModel):
+    pass
+
+class InspectImageArgs(BaseModel):
+    image_path: str = Field(..., description="The name or path of the image file to inspect (e.g. screenshot.png).")
+    query: str = Field(..., description="Specific question to ask about the image (e.g. 'What windows are open?').")
+
+class SearchCodebaseArgs(BaseModel):
+    query: str = Field(..., description="The semantic search query to match against workspace files.")
+
+class IndexCodebaseArgs(BaseModel):
+    pass
+
+
+# --------------------------------------------------
+# Core Tool Implementations
+# --------------------------------------------------
 def write_file(filename, content):
     """
     Creates or updates a file locally with the specified content.
@@ -69,7 +101,30 @@ def inspect_image(image_path, query):
     except Exception as e:
         return json.dumps({"status": "error", "message": str(e)})
 
-# Tool definitions (JSON schemas for OpenRouter)
+def search_codebase(query):
+    """
+    Queries the vector database for semantically relevant workspace code.
+    """
+    try:
+        results = vector_store.search(query, limit=5)
+        return json.dumps({"status": "success", "results": results})
+    except Exception as e:
+        return json.dumps({"status": "error", "message": f"Semantic search failed: {str(e)}"})
+
+def index_codebase():
+    """
+    Re-scans and indexes local files in the workspace.
+    """
+    try:
+        count = vector_store.index_workspace()
+        return json.dumps({"status": "success", "message": f"Indexed {count} code chunks across workspace."})
+    except Exception as e:
+        return json.dumps({"status": "error", "message": f"Workspace indexing failed: {str(e)}"})
+
+
+# --------------------------------------------------
+# Tool schemas (JSON schemas for OpenRouter)
+# --------------------------------------------------
 TOOL_SCHEMAS = [
     {
         "type": "function",
@@ -140,12 +195,40 @@ TOOL_SCHEMAS = [
                 "required": ["image_path", "query"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_codebase",
+            "description": "Searches code files and documents in the workspace semantically to find relevant functions, files, or variables.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "The search query to match against the codebase (e.g. 'where is DEFAULT_MODEL defined?')."
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "index_codebase",
+            "description": "Forces a scan and re-indexing of all files in the workspace to update the vector database.",
+            "parameters": {
+                "type": "object",
+                "properties": {}
+            }
+        }
     }
 ]
 
 def execute_tool(name, arguments):
     """
-    Dispatcher to execute a tool locally by name and string/dict arguments.
+    Dispatcher to execute a tool locally by name with strict Pydantic argument validation.
     """
     # Parse arguments if passed as string
     if isinstance(arguments, str):
@@ -154,14 +237,32 @@ def execute_tool(name, arguments):
         except Exception:
             return json.dumps({"status": "error", "message": "Failed to parse arguments JSON."})
 
-    if name == "write_file":
-        return write_file(arguments.get("filename"), arguments.get("content"))
-    elif name == "read_file":
-        return read_file(arguments.get("filename"))
-    elif name == "take_screenshot":
-        return take_screenshot()
-    elif name == "inspect_image":
-        return inspect_image(arguments.get("image_path"), arguments.get("query"))
-    else:
-        return json.dumps({"status": "error", "message": f"Tool '{name}' not found."})
+    try:
+        if name == "write_file":
+            validated = WriteFileArgs.model_validate(arguments)
+            return write_file(validated.filename, validated.content)
+        elif name == "read_file":
+            validated = ReadFileArgs.model_validate(arguments)
+            return read_file(validated.filename)
+        elif name == "take_screenshot":
+            # No arguments expected, but we validate if any structure is passed
+            TakeScreenshotArgs.model_validate(arguments or {})
+            return take_screenshot()
+        elif name == "inspect_image":
+            validated = InspectImageArgs.model_validate(arguments)
+            return inspect_image(validated.image_path, validated.query)
+        elif name == "search_codebase":
+            validated = SearchCodebaseArgs.model_validate(arguments)
+            return search_codebase(validated.query)
+        elif name == "index_codebase":
+            IndexCodebaseArgs.model_validate(arguments or {})
+            return index_codebase()
+        else:
+            return json.dumps({"status": "error", "message": f"Tool '{name}' not found."})
+    except ValidationError as e:
+        return json.dumps({
+            "status": "validation_error", 
+            "message": f"Invalid arguments supplied for tool '{name}'. Details: {e.errors()}"
+        })
+
 

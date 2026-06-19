@@ -8,11 +8,17 @@ __pycache__/
 *$py.class
 .pytest_cache/
 
+# Local Vector Database files
+.vector_store/
+
+
 # Local Screen Captures and Temporary Images
 screenshot.png
 temp_pasted_image.png
 test_image.png
 temp.txt
+todo.txt
+output_design.txt
 
 # OS-specific temporary files
 .DS_Store

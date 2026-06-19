@@ -131,7 +131,34 @@ document.addEventListener("DOMContentLoaded", () => {
     
     let pastedImageBase64 = null;
 
+    const uploadBtn = document.getElementById("upload-btn");
+    const fileInput = document.getElementById("file-input");
+
+    // Click upload icon to open file dialog
+    if (uploadBtn && fileInput) {
+        uploadBtn.addEventListener("click", () => {
+            fileInput.click();
+        });
+
+        // Handle file selection
+        fileInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file && file.type.startsWith("image/")) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    pastedImageBase64 = event.target.result;
+                    previewImg.src = pastedImageBase64;
+                    previewWrapper.style.display = "flex";
+                };
+                reader.readAsDataURL(file);
+            }
+            // Clear value to allow selecting same file again
+            fileInput.value = "";
+        });
+    }
+
     // Handle image pasting (Ctrl+V)
+
     chatInput.addEventListener("paste", (e) => {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (const item of items) {
@@ -166,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, "&#039;");
     };
 
-    const appendMessage = (sender, text, imageUrl = null) => {
+    const appendMessage = (sender, text, imageUrl = null, save = true) => {
         const msgDiv = document.createElement("div");
         msgDiv.className = `message ${sender}-msg`;
         let escapedText = escapeHtml(text || "");
@@ -177,6 +204,19 @@ document.addEventListener("DOMContentLoaded", () => {
         msgDiv.innerHTML = contentHtml;
         chatBox.appendChild(msgDiv);
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        if (save && currentChatId) {
+            const chat = chats.find(c => c.id === currentChatId);
+            if (chat) {
+                chat.messages.push({ sender, text, imageUrl });
+                // If it is the first user query, set it as the session title
+                if (chat.title === "New Session" && sender === "user" && text) {
+                    chat.title = text.length > 25 ? text.substring(0, 22) + "..." : text;
+                }
+                saveChats();
+                renderSidebar();
+            }
+        }
     };
 
     const appendConsole = (text, type = "normal") => {
@@ -280,5 +320,15 @@ document.addEventListener("DOMContentLoaded", () => {
     snapBtn.addEventListener("click", () => {
         runChatRequest("Take a screenshot and summarize what is visible on the desktop screen.");
     });
-});
 
+    // Initialize chat sessions
+    if (newChatBtn) {
+        newChatBtn.addEventListener("click", startNewChat);
+    }
+    
+    if (chats.length > 0) {
+        loadChat(chats[0].id);
+    } else {
+        startNewChat();
+    }
+});

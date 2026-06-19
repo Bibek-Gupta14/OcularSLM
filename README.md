@@ -9,9 +9,8 @@
 
 ## 🎨 System Walkthrough & Screenshots
 
-| **1. Initial Dashboard Layout** |
-| :---: | 
-| ![Initial Dashboard](/assets/dashboard.png) |
+**1. Initial Dashboard Layout**  
+<img src="assets/dashboard.png" width="550px" height="475px" alt="Initial Dashboard"> 
 
 ---
 
@@ -82,6 +81,10 @@ Python <br><br>
 <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" width="60"/>
 </a>
 </td>
+<td align="center" width="120" style="padding:10px;">
+GitHub <br><br>
+<img src="https://skillicons.dev/icons?i=github" width="60"/>
+</td>
 
 <td align="center" width="120" style="padding:10px;">
 JavaScript <br><br>
@@ -93,21 +96,18 @@ JavaScript <br><br>
 <td align="center" width="120" style="padding:10px;">
 HTML5 <br><br>
 <a href="https://www.w3.org/html/" target="_blank">
-<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" width="60"/>
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original-wordmark.svg" width="70"/>
 </a>
 </td>
 
 <td align="center" width="120" style="padding:10px;">
 CSS3 <br><br>
 <a href="https://www.w3schools.com/css/" target="_blank">
-<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" width="60"/>
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original-wordmark.svg" width="70"/>
 </a>
 </td>
 
-<td align="center" width="120" style="padding:10px;">
-GitHub <br><br>
-<img src="https://skillicons.dev/icons?i=github" width="60"/>
-</td>
+
 
 </tr>
 </table>
@@ -157,7 +157,7 @@ KIRO  <br><br>
 
 ### 1. Clone & Navigate to Project Workspace
 ```powershell
-cd "c:\Users\KIIT0001\OneDrive\Desktop\GENAI\AI Notetaker"
+git clone https://github.com/Bibek-Gupta14/OcularSLM
 ```
 
 ### 2. Configure Environment Variables

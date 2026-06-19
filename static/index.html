@@ -15,19 +15,31 @@
     <!-- SVG Scroll Animated Line -->
     <div class="svg-line-container">
         <svg class="scroll-svg" viewBox="0 0 100 1200" preserveAspectRatio="none">
-            <path id="scroll-path" d="M 50 0 C 15 250, 85 500, 50 750 C 15 1000, 85 1100, 50 1200" stroke="url(#scroll-grad)" stroke-width="4" fill="none" stroke-linecap="round"/>
+            <path id="scroll-path" d="M 50 0 C 5 150, 95 300, 10 450 C 95 600, 5 750, 90 900 C 5 1050, 95 1150, 50 1200" stroke="url(#scroll-grad)" stroke-width="3" fill="none" stroke-linecap="round"/>
             <defs>
                 <linearGradient id="scroll-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#0A84FF"/>
-                    <stop offset="50%" stop-color="#30D158"/>
-                    <stop offset="100%" stop-color="#0A84FF"/>
+                    <stop offset="0%" stop-color="#fa520f"/>
+                    <stop offset="50%" stop-color="#ffa110"/>
+                    <stop offset="100%" stop-color="#ffd900"/>
                 </linearGradient>
             </defs>
         </svg>
     </div>
 
-    <!-- Main Container -->
-    <div class="app-layout">
+    <div class="app-container">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-title">
+                <span>💬 Conversations</span>
+            </div>
+            <button id="new-chat-btn" class="btn btn-new-chat">+ New Chat</button>
+            <div class="sidebar-list" id="sidebar-list">
+                <!-- Loaded dynamically -->
+            </div>
+        </aside>
+
+        <div class="app-layout">
         
         <!-- HEADER -->
         <header class="app-header animate-fade-in">
@@ -91,10 +103,13 @@
                     </div>
                 </div>
                 <div class="chat-input-area">
-                    <input type="text" id="chat-input" placeholder="Type instruction or Paste image (Ctrl+V)..." autocomplete="off">
+                    <input type="file" id="file-input" accept="image/*" style="display: none;">
+                    <button id="upload-btn" class="btn btn-secondary" style="padding: 12px; margin-right: 8px; font-size: 1.1rem;" title="Upload Image File">📂</button>
+                    <input type="text" id="chat-input" placeholder="Type instruction, paste image, or click clip..." autocomplete="off">
                     <button id="send-btn" class="btn btn-primary">Send</button>
                 </div>
             </section>
+
 
             <!-- SECTION 3: REAL-TIME CONSOLE & SCREENSHOT -->
             <section class="card dashboard-card animate-slide-up" style="--delay: 3;">
@@ -130,10 +145,14 @@
 
         </main>
 
+        <!-- Horizontal Sunset Stripe Brand Element -->
+        <div class="sunset-stripe-band"></div>
+
         <footer class="app-footer">
-            <p class="btn">Hybrid SLM + Vision Agent</p>
             <p>Built with ❤️ for OpenSource Community and Edge Device Autonomy.</p>
         </footer>
+
+        </div>
 
     </div>
 
